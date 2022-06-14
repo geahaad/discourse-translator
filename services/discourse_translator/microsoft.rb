@@ -11,41 +11,57 @@ module DiscourseTranslator
     DETECT_URI = "https://api.cognitive.microsofttranslator.com/detect"
     ISSUE_TOKEN_URI = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
 
-    LENGTH_LIMIT = 5_000
+    LENGTH_LIMIT = 10_000
 
-    SUPPORTED_LANG = {
-      en: 'en',
-      en_US: 'en',
-      en_GB: 'en',
-      bs_BA: 'bs-Latn',
-      cs: 'cs',
-      da: 'da',
-      de: 'de',
-      ar: 'ar',
-      es: 'es',
-      fi: 'fi',
-      fr: 'fr',
-      he: 'he',
-      id: 'id',
-      it: 'it',
-      ja: 'ja',
-      ko: 'ko',
-      nl: 'nl',
-      pt: 'pt',
-      ro: 'ro',
-      ru: 'ru',
-      sv: 'sv',
-      uk: 'uk',
-      vi: 'vi',
-      zh_CN: 'zh-Hans',
-      zh_TW: 'zh-Hant',
-      tr_TR: 'tr',
-      te: nil,
-      sq: nil,
-      pt_BR: 'pt',
-      pl_PL: 'pl',
-      no_NO: 'no',
-      fa_IR: 'fa'
+    # Hash which maps Discourse's locale code to Microsoft Translator's language code found in
+    # https://docs.microsoft.com/en-us/azure/cognitive-services/translator/language-support
+    SUPPORTED_LANG_MAPPING = {
+      ar: "ar",
+      bs_BA: "bs",
+      bg: "bg",
+      ca: "ca",
+      cs: "cs",
+      da: "da",
+      de: "de",
+      el: "el",
+      en: "en",
+      en_GB: "en",
+      en_US: "en",
+      es: "es",
+      et: "et",
+      fa_IR: "fa",
+      fi: "fi",
+      fr: "fr",
+      gl: "gl",
+      he: "he",
+      hu: "hu",
+      id: "id",
+      it: "it",
+      ja: "ja",
+      ko: "ko",
+      lt: "lt",
+      lv: "lv",
+      nl: "nl",
+      nb_NO: "nb",
+      pl_PL: "pl",
+      pt: "pt",
+      pt_BR: "pt",
+      ro: "ro",
+      ru: "ru",
+      sk: "sk",
+      sq: "sq",
+      sl: "sl",
+      sr: "sr-Cryl",
+      sv: "sv",
+      sw: "sw",
+      te: "te",
+      th: "th",
+      tr_TR: "tr",
+      uk: "uk",
+      ur: "ur",
+      vi: "vi",
+      zh_CN: "zh-Hans",
+      zh_TW: "zh-Hant"
     }
 
     def self.access_token_key
@@ -108,8 +124,8 @@ module DiscourseTranslator
     def self.translate(post)
       detected_lang = detect(post)
 
-      if !SUPPORTED_LANG.keys.include?(detected_lang.to_sym) &&
-         !SUPPORTED_LANG.values.include?(detected_lang.to_s)
+      if !SUPPORTED_LANG_MAPPING.keys.include?(detected_lang.to_sym) &&
+         !SUPPORTED_LANG_MAPPING.values.include?(detected_lang.to_s)
 
         raise TranslatorError.new(I18n.t('translator.failed'))
       end
@@ -140,7 +156,7 @@ module DiscourseTranslator
     private
 
     def self.locale
-      SUPPORTED_LANG[I18n.locale] || (raise I18n.t("translator.not_supported"))
+      SUPPORTED_LANG_MAPPING[I18n.locale] || (raise I18n.t("translator.not_supported"))
     end
 
     def self.post(uri, body, headers = {})
